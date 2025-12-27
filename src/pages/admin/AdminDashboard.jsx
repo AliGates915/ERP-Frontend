@@ -1,30 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "../../components/ui/table";
 import { HashLoader } from "react-spinners";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Line,
-  Legend,
-  LineChart,
-} from "recharts";
-
 import {
   Users,
   Package,
@@ -40,7 +16,6 @@ import {
   Cloud,
 } from "lucide-react";
 import CommanHeader from "../../components/CommanHeader";
-
 import HeaderSkeleton from "./HeaderSkeleton";
 import SummaryCardSkeleton from "./SummaryCardSkeleton";
 import ChartSkeleton from "./ChartSkeleton";
@@ -364,69 +339,6 @@ const AdminDashboard = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // ✅ Mark single notification as read
-  const clearNotification = async (id) => {
-    try {
-      await axios.put(`${base}/notifications/${id}/read`);
-      setNotifications((prev) => prev.filter((n) => n._id !== id));
-    } catch (err) {
-      console.error("Clear failed:", err);
-    }
-  };
-
-  // ✅ Mark all notifications as read
-  const clearAll = async () => {
-    try {
-      await axios.put(`${base}/notifications/mark-all`, {
-        headers: {
-          Authorization: `Bearer ${userInfo.token}`,
-        },
-      });
-      setNotifications([]);
-    } catch (err) {
-      console.error("Clear all failed:", err);
-    }
-  };
-
-  // Format time for display
-  const formatTime = (date) => {
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
-
-  // Format date for display
-  const formatDate = (date) => {
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  // Get greeting based on time of day
-  const getGreeting = () => {
-    const hour = currentTime.getHours();
-    if (hour < 12) return "Good Morning";
-    if (hour < 17) return "Good Afternoon";
-    return "Good Evening";
-  };
-
-  // Get appropriate icon based on time of day
-  const getGreetingIcon = () => {
-    const hour = currentTime.getHours();
-    if (hour < 12) return <Sun className="text-amber-500" size={24} />;
-    if (hour < 17) return <Cloud className="text-blue-400" size={24} />;
-    return <Moon className="text-indigo-500" size={24} />;
-  };
-  const data = [
-    { day: "22th", thisWeek: 100, lastWeek: 60 },
-    { day: "23th", thisWeek: 120, lastWeek: 80 },
-    { day: "24th", thisWeek: 160, lastWeek: 70 },
-    { day: "25th", thisWeek: 155, lastWeek: 65 },
-    { day: "26th", thisWeek: 170, lastWeek: 75 },
-    { day: "27th", thisWeek: 177, lastWeek: 77 },
-    { day: "28th", thisWeek: 150, lastWeek: 90 },
-  ];
 
   const summaryData = [
     {
@@ -434,48 +346,36 @@ const AdminDashboard = () => {
       value: customers,
       icon: <Users size={24} />,
       change: "+12%",
-      color: "bg-blue-100 text-blue-600",
-      border: "border-l-4 border-blue-700",
     },
     {
       name: "Total Products",
       value: items,
       icon: <Package size={24} />,
       change: "+5%",
-      color: "bg-green-100 text-green-600",
-      border: "border-l-4 border-green-400",
     },
     {
       name: "Total Staff",
       value: users,
       icon: <UserCheck size={24} />,
       change: "+2%",
-      color: "bg-purple-100 text-purple-600",
-      border: "border-l-4 border-purple-400",
     },
     {
       name: "Total Sales",
       value: sales,
       icon: <CreditCard size={24} />,
       change: "+18%",
-      color: "bg-amber-100 text-amber-600",
-      border: "border-l-4 border-amber-500",
     },
     // {
     //   name: "Total Revenue",
     //   value: `$${revenue.toLocaleString()}`,
     //   icon: <DollarSign size={24} />,
     //   change: "+15%",
-    //   color: "bg-emerald-100 text-emerald-600",
-    //   border: "border-l-4 border-emerald-500",
     // },
     {
       name: "Bookings",
       value: booking,
       icon: <Calendar size={24} />,
       change: "-3%",
-      color: "bg-rose-100 text-rose-600",
-      border: "border-l-4 border-rose-400",
     },
   ];
 
@@ -524,133 +424,163 @@ const AdminDashboard = () => {
         <SummaryCardSkeleton />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-10">
-          {summaryData.map((item, index) => (
-            <div
-              key={index}
-              className="group relative bg-white rounded-xl border border-gray-200/60 hover:border-gray-300 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 overflow-hidden"
-              style={{
-                animation: `slideIn 0.5s ease-out ${index * 0.06}s both`,
-              }}
-            >
-              {/* Professional top accent border */}
-              <div
-                className={`absolute top-0 left-0 right-0 h-1 ${
-                  item.change.includes("+")
-                    ? "bg-gradient-to-r from-emerald-500 to-emerald-400"
-                    : "bg-gradient-to-r from-rose-500 to-rose-400"
-                }`}
-              ></div>
+          {summaryData.map((item, index) => {
+            // Define unique color gradients for each card type
+            const colorConfigs = [
+              // Blue gradient for first card
+              {
+                accent: "from-blue-500 to-cyan-400",
+                statusBg: "bg-blue-500/10",
+                statusBorder: "border-blue-200/50",
+                statusText: "text-blue-700",
+                iconBg: "bg-blue-50",
+                iconBorder: "border-blue-100",
+                iconColor: "text-blue-600",
+                progress: "linear-gradient(90deg, #3b82f6, #06b6d4)",
+                hoverBg: "from-blue-50/30 to-cyan-50/10",
+              },
+              // Emerald gradient for second card
+              {
+                accent: "from-emerald-500 to-teal-400",
+                statusBg: "bg-emerald-500/10",
+                statusBorder: "border-emerald-200/50",
+                statusText: "text-emerald-700",
+                iconBg: "bg-emerald-50",
+                iconBorder: "border-emerald-100",
+                iconColor: "text-emerald-600",
+                progress: "linear-gradient(90deg, #059669, #0d9488)",
+                hoverBg: "from-emerald-50/30 to-teal-50/10",
+              },
+              // Purple gradient for third card
+              {
+                accent: "from-purple-500 to-violet-400",
+                statusBg: "bg-purple-500/10",
+                statusBorder: "border-purple-200/50",
+                statusText: "text-purple-700",
+                iconBg: "bg-purple-50",
+                iconBorder: "border-purple-100",
+                iconColor: "text-purple-600",
+                progress: "linear-gradient(90deg, #7c3aed, #8b5cf6)",
+                hoverBg: "from-purple-50/30 to-violet-50/10",
+              },
+              // Amber gradient for fourth card
+              {
+                accent: "from-amber-500 to-orange-400",
+                statusBg: "bg-amber-500/10",
+                statusBorder: "border-amber-200/50",
+                statusText: "text-amber-700",
+                iconBg: "bg-amber-50",
+                iconBorder: "border-amber-100",
+                iconColor: "text-amber-600",
+                progress: "linear-gradient(90deg, #d97706, #f59e0b)",
+                hoverBg: "from-amber-50/30 to-orange-50/10",
+              },
+              // Rose gradient for fifth card
+              {
+                accent: "from-rose-500 to-pink-400",
+                statusBg: "bg-rose-500/10",
+                statusBorder: "border-rose-200/50",
+                statusText: "text-rose-700",
+                iconBg: "bg-rose-50",
+                iconBorder: "border-rose-100",
+                iconColor: "text-rose-600",
+                progress: "linear-gradient(90deg, #e11d48, #ec4899)",
+                hoverBg: "from-rose-50/30 to-pink-50/10",
+              },
+            ];
 
-              {/* Subtle background texture */}
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-50/30 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            // Use modulo to cycle through colors if more than 5 cards
+            const color = colorConfigs[index % colorConfigs.length];
 
-              {/* Status badge - Professional style */}
+            // Or if you want to match specific data types with colors:
+            // const color = getColorByDataType(item.name);
+
+            return (
               <div
-                className={`absolute top-3 right-3 z-10 backdrop-blur-sm ${
-                  item.change.includes("+")
-                    ? "bg-emerald-500/10 border border-emerald-200/50"
-                    : "bg-rose-500/10 border border-rose-200/50"
-                } rounded-lg px-2.5 py-1.5`}
+                key={index}
+                className="group relative bg-white rounded-xl border border-gray-200/60 hover:border-gray-300 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+                style={{
+                  animation: `slideIn 0.5s ease-out ${index * 0.06}s both`,
+                }}
               >
-                <span
-                  className={`text-xs font-semibold flex items-center gap-1 ${
-                    item.change.includes("+")
-                      ? "text-emerald-700"
-                      : "text-rose-700"
-                  }`}
+                {/* Top accent border with unique gradient */}
+                <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${color.accent}`}></div>
+
+                {/* Subtle background texture */}
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-50/30 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                {/* Status badge */}
+                <div
+                  className={`absolute top-3 right-3 z-10 backdrop-blur-sm ${color.statusBg} border ${color.statusBorder} rounded-lg px-2.5 py-1.5`}
                 >
-                  {item.change.includes("+") ? (
-                    <svg
-                      className="w-3 h-3"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  ) : (
-                    <svg
-                      className="w-3 h-3"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
-                  {item.change}
-                </span>
-              </div>
+                  <span className={`text-xs font-semibold flex items-center gap-1 ${color.statusText}`}>
+                    {item.change.includes("+") ? (
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    ) : (
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    )}
+                    {item.change}
+                  </span>
+                </div>
 
-              <div className="relative p-5 z-20">
-                {/* Icon and value section */}
-                <div className="flex items-start gap-4 mb-5">
-                  <div
-                    className={`p-3 rounded-xl ${
-                      item.change.includes("+") ? "bg-emerald-50" : "bg-rose-50"
-                    } border ${
-                      item.change.includes("+")
-                        ? "border-emerald-100"
-                        : "border-rose-100"
-                    } group-hover:scale-105 transition-transform duration-300`}
-                  >
+                <div className="relative p-5 z-20">
+                  {/* Icon and value section */}
+                  <div className="flex items-start gap-4 mb-5">
                     <div
-                      className={`w-6 h-6 ${
-                        item.change.includes("+")
-                          ? "text-emerald-600"
-                          : "text-rose-600"
-                      }`}
+                      className={`p-3 rounded-xl ${color.iconBg} border ${color.iconBorder} group-hover:scale-105 transition-transform duration-300`}
                     >
-                      {item.icon}
+                      <div className={`w-6 h-6 ${color.iconColor}`}>
+                        {item.icon}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-2xl font-bold text-gray-900 mb-0.5">
+                        {item.value}
+                      </div>
+                      <div className="text-sm font-medium text-gray-500">
+                        {item.name}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex-1">
-                    <div className="text-2xl font-bold text-gray-900 mb-0.5">
-                      {item.value}
+
+                  {/* Progress indicator */}
+                  <div className="space-y-2.5 pt-4 border-t border-gray-100">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs font-medium text-gray-400">
+                        TREND
+                      </span>
                     </div>
-                    <div className="text-sm font-medium text-gray-500">
-                      {item.name}
+                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-700 ease-out"
+                        style={{
+                          width: `${Math.min(100, 15 + index * 14)}%`,
+                          background: color.progress,
+                        }}
+                      ></div>
                     </div>
                   </div>
                 </div>
 
-                {/* Progress indicator - Professional style */}
-                <div className="space-y-2.5 pt-4 border-t border-gray-100">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-medium text-gray-400">
-                      TREND
-                    </span>
-                  </div>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-700 ease-out"
-                      style={{
-                        width: `${Math.min(100, 15 + index * 14)}%`,
-                        background: item.change.includes("+")
-                          ? "linear-gradient(90deg, #059669, #10b981)"
-                          : "linear-gradient(90deg, #dc2626, #ef4444)",
-                      }}
-                    ></div>
-                  </div>
-                </div>
+                {/* Hover effect overlay */}
+                <div
+                  className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none bg-gradient-to-br ${color.hoverBg}`}
+                ></div>
               </div>
-
-              {/* Hover effect overlay */}
-              <div
-                className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none ${
-                  item.change.includes("+")
-                    ? "bg-gradient-to-br from-emerald-50/20 via-transparent to-transparent"
-                    : "bg-gradient-to-br from-rose-50/20 via-transparent to-transparent"
-                }`}
-              ></div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
       {/* Charts Section */}
@@ -1058,9 +988,8 @@ const AdminDashboard = () => {
                     <div className="text-gray-600">{booking.paymentMethod}</div>
                     <div>
                       <span
-                        className={`px-2 py-1 text-xs rounded-full ${
-                          statusColor[booking.status]
-                        }`}
+                        className={`px-2 py-1 text-xs rounded-full ${statusColor[booking.status]
+                          }`}
                       >
                         {booking.status}
                       </span>
