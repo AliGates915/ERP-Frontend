@@ -111,7 +111,7 @@ const navigate=useNavigate()
   };
   const handleLogout = () => {
     localStorage.removeItem("userInfo");
-    navigate("/");
+    navigate("/login");
   };
 
   return (

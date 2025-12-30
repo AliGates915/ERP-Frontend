@@ -158,7 +158,7 @@ const AdminSidebar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("userInfo");
-    navigate("/");
+    navigate("/login");
   };
 
   useEffect(() => {

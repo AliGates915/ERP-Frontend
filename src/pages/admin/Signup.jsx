@@ -63,7 +63,7 @@ const Signup = () => {
       );
      
       toast.success("Signup successful!");
-      navigate("/");
+      navigate("/login");
     } catch (error) {
       const message =
         error.response?.data?.message ||
