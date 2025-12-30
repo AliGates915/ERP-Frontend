@@ -139,6 +139,7 @@ import ComplientAssignedToEmployee from "./pages/admin/complaintManagement/Compl
 import PendingComplaints from "./pages/admin/complaintManagement/PendingComplaints.jsx";
 import ResolvedComplaints from "./pages/admin/complaintManagement/ResolvedComplaints.jsx";
 import ProductInstalled from "./pages/admin/complaintManagement/ProductInstalled.jsx";
+import LandingPage from "./pages/LandingPage/LandingPage.jsx";
 
 function AppContent() {
   return (
@@ -148,7 +149,8 @@ function AppContent() {
         <Routes>
           {/* Public Routes */}
 
-          <Route path="/" element={<Login />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/signup" element={<Signup />} />
 
           {/* Admin Routes */}
