@@ -37,8 +37,8 @@ const ProtectedRoute = ({ children, role }) => {
     checkTokenValidOrNot();
   }, []);
   if (isValid === null) return null;
-  if (!user || !isValid) return <Navigate to="/" replace />;
-  if (role && user.role !== role) return <Navigate to="/" />;
+  if (!user || !isValid) return <Navigate to="/login" replace />;
+  if (role && user.role !== role) return <Navigate to="/login" />;
 
   return children;
 };
